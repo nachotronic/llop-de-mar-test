@@ -19,6 +19,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let selectedSessionDay = 1;
   let cachedWeatherData = null;
   let map = null;
+  const SESSION_TIMES_BY_DAY = {
+  1: ["08:00", "09:00", "16:30", "17:45", "19:00", "20:15"],
+  3: ["08:00", "09:00", "16:30", "17:45", "19:00", "20:15"],
+  5: ["17:00", "18:45"]
+};
 
   function initMap() {
     const mapElement = document.getElementById("map");
@@ -597,22 +602,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
     updateWindOverlay(session.wind, session.direction);
   }
+function updateAvailableSessionButtons() {
+  const allowedTimes = SESSION_TIMES_BY_DAY[selectedSessionDay] || [];
 
-  function syncControls() {
-    document.querySelectorAll(".day-btn").forEach(btn => {
-      btn.classList.toggle(
-        "active",
-        Number(btn.dataset.day) === selectedSessionDay
-      );
-    });
-
-    document.querySelectorAll(".session-btn").forEach(btn => {
-      btn.classList.toggle(
-        "active",
-        btn.dataset.time === selectedSessionTime
-      );
-    });
+  if (!allowedTimes.includes(selectedSessionTime)) {
+    selectedSessionTime = allowedTimes[0] || "08:00";
   }
+
+  document.querySelectorAll(".session-btn").forEach(btn => {
+    const isAllowed = allowedTimes.includes(btn.dataset.time);
+    btn.hidden = !isAllowed;
+  });
+}
+  function syncControls() {
+  updateAvailableSessionButtons();
+
+  document.querySelectorAll(".day-btn").forEach(btn => {
+    btn.classList.toggle(
+      "active",
+      Number(btn.dataset.day) === selectedSessionDay
+    );
+  });
+
+  document.querySelectorAll(".session-btn").forEach(btn => {
+    btn.classList.toggle(
+      "active",
+      btn.dataset.time === selectedSessionTime
+    );
+  });
+}
 
   function attachControlEvents() {
     document.querySelectorAll(".day-btn").forEach(button => {
