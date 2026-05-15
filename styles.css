@@ -258,23 +258,6 @@ body {
   white-space: nowrap;
 }
 
-.sea-pill {
-  background: #eef7f8;
-}
-
-.wave-arrow-inline {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  line-height: 14px;
-  text-align: center;
-  margin: 0 .18rem 0 .1rem;
-  color: var(--ink-soft);
-  font-size: .92rem;
-  font-weight: 900;
-  transform-origin: center;
-}
-
 /* Caja viento + mar + comentario */
 .mini-wind-card {
   display: grid;
@@ -466,12 +449,22 @@ body {
   border: 1px solid rgba(16,47,58,.10);
 }
 
+/* Por si todavía usamos SVG interno */
 .sea-mini-icon svg {
   width: 54px;
   height: 54px;
   display: block;
 }
 
+/* Iconos Meteocat en imagen */
+.sea-mini-img {
+  width: 54px;
+  height: 54px;
+  display: block;
+  object-fit: contain;
+}
+
+/* Si alguna clase de nivel sigue aplicada, mantenemos todo azul */
 .sea-mini-calm,
 .sea-mini-small,
 .sea-mini-moderate,
@@ -798,6 +791,11 @@ body {
   }
 
   .sea-mini-icon svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .sea-mini-img {
     width: 40px;
     height: 40px;
   }
