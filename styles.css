@@ -570,6 +570,11 @@ body {
   padding: .8rem;
 }
 
+/* Disclaimer duplicado: por defecto solo se ve el de desktop */
+.notice-mobile-after-map {
+  display: none;
+}
+
 .leaflet-container {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
@@ -709,6 +714,15 @@ body {
 
   .map-note {
     display: none;
+  }
+
+  /* En móvil ocultamos el disclaimer de la tarjeta y mostramos el de debajo del mapa */
+  .weather-card > .notice {
+    display: none;
+  }
+
+  .notice-mobile-after-map {
+    display: block;
   }
 
   /* Flechas sobre el iframe en móvil */
