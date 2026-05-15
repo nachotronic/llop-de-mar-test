@@ -210,52 +210,54 @@ document.addEventListener("DOMContentLoaded", () => {
     return `${windNameCatalan(deg)} · ${directionName(deg)}`;
   }
 
-  function seaMiniIconHTML(marine) {
-    if (!marine || marine.waveHeight == null) return "";
-
-    const level = seaStateLevel(marine.waveHeight);
-
-    const className = {
-      calm: "sea-mini-calm",
-      small: "sea-mini-small",
-      moderate: "sea-mini-moderate",
-      high: "sea-mini-high",
-      "very-high": "sea-mini-very-high",
-      unknown: "sea-mini-moderate"
-    }[level];
-
-    const directionHTML = marine.waveDirection != null
-      ? `
-        <span class="sea-mini-direction">
-          <span
-            class="sea-mini-direction-arrow"
-            style="transform: rotate(${marine.waveDirection}deg)"
-            aria-hidden="true"
-          >↑</span>
-          ${waveDirectionLabel(marine.waveDirection)}
-        </span>
-      `
-      : "";
-
-    return `
-      <div class="sea-mini">
-        <span class="sea-mini-icon ${className}" aria-hidden="true">
-          <svg viewBox="0 0 24 24" focusable="false">
-            <path fill="currentColor" d="M3 14.5c1.8 0 2.7-.7 3.6-1.4.9-.7 1.8-1.4 3.6-1.4s2.7.7 3.6 1.4c.9.7 1.8 1.4 3.6 1.4s2.7-.7 3.6-1.4v2.7c-.9.6-1.9 1.1-3.6 1.1-1.8 0-2.7-.7-3.6-1.4-.9-.7-1.8-1.4-3.6-1.4s-2.7.7-3.6 1.4c-.9.7-1.8 1.4-3.6 1.4v-2.4Z"/>
-            <path fill="currentColor" opacity=".55" d="M3 9.5c1.8 0 2.7-.7 3.6-1.4.9-.7 1.8-1.4 3.6-1.4s2.7.7 3.6 1.4c.9.7 1.8 1.4 3.6 1.4s2.7-.7 3.6-1.4v2.7c-.9.6-1.9 1.1-3.6 1.1-1.8 0-2.7-.7-3.6-1.4-.9-.7-1.8-1.4-3.6-1.4s-2.7.7-3.6 1.4c-.9.7-1.8 1.4-3.6 1.4V9.5Z"/>
-          </svg>
-        </span>
-
-        <span class="sea-mini-data">
-          <span>
-            <span class="sea-mini-value">${marine.waveHeight.toFixed(1)} m</span>
-            <span class="sea-mini-label">${seaStateLabel(marine.waveHeight)}</span>
-          </span>
-          ${directionHTML}
-        </span>
-      </div>
-    `;
+ function seaIconFile(waveHeight) {
+  if (waveHeight == null || Number.isNaN(waveHeight)) {
+    return "assets/meteocat/marejol.svg";
   }
+
+  if (waveHeight < 0.10) return "assets/meteocat/mar-en-calma.svg";
+  if (waveHeight <= 0.20) return "assets/meteocat/onadeta.svg";
+  if (waveHeight < 0.50) return "assets/meteocat/marejol.svg";
+  if (waveHeight < 1.25) return "assets/meteocat/maror.svg";
+  if (waveHeight < 2.50) return "assets/meteocat/forta-maror.svg";
+
+  return "assets/meteocat/maregassa.svg";
+}
+
+function seaMiniIconHTML(marine) {
+  if (!marine || marine.waveHeight == null) return "";
+
+  const iconSrc = seaIconFile(marine.waveHeight);
+
+  const directionHTML = marine.waveDirection != null
+    ? `
+      <span class="sea-mini-direction">
+        <span
+          class="sea-mini-direction-arrow"
+          style="transform: rotate(${marine.waveDirection}deg)"
+          aria-hidden="true"
+        >↑</span>
+        ${waveDirectionLabel(marine.waveDirection)}
+      </span>
+    `
+    : "";
+
+  return `
+    <div class="sea-mini">
+      <span class="sea-mini-icon" aria-hidden="true">
+        <img src="${iconSrc}" alt="" class="sea-mini-img">
+      </span>
+
+      <span class="sea-mini-data">
+        <span>
+          <span class="sea-mini-value">${marine.waveHeight.toFixed(1)} m</span>
+          <span class="sea-mini-label">${seaStateLabel(marine.waveHeight)}</span>
+        </span>
+        ${directionHTML}
+      </span>
+    </div>
+  `;
+}
 
   function marineComment(marine) {
     if (!marine || marine.waveHeight == null) {
