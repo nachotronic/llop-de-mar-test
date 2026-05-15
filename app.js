@@ -1,9 +1,8 @@
 /*
   app.js · Llop de Mar Test
-  Versión con iconos Meteocat y redondeo común de ola.
+  Versión con iconos Meteocat, viernes y flechas en mapa móvil.
 
-  Importante:
-  Los iconos deben estar en:
+  Iconos:
   assets/meteocat/mar-en-calma.svg
   assets/meteocat/onadeta.svg
   assets/meteocat/marejol.svg
@@ -19,11 +18,12 @@ document.addEventListener("DOMContentLoaded", () => {
   let selectedSessionDay = 1;
   let cachedWeatherData = null;
   let map = null;
+
   const SESSION_TIMES_BY_DAY = {
-  1: ["08:00", "09:00", "16:30", "17:45", "19:00", "20:15"],
-  3: ["08:00", "09:00", "16:30", "17:45", "19:00", "20:15"],
-  5: ["17:00", "18:45"]
-};
+    1: ["08:00", "09:00", "16:30", "17:45", "19:00", "20:15"],
+    3: ["08:00", "09:00", "16:30", "17:45", "19:00", "20:15"],
+    5: ["17:00", "18:45"]
+  };
 
   function initMap() {
     const mapElement = document.getElementById("map");
@@ -202,9 +202,6 @@ document.addEventListener("DOMContentLoaded", () => {
     - elegir icono;
     - elegir etiqueta;
     - elegir comentario.
-
-    Así, si se muestra 0,2 m, también se usa 0,2 para decidir
-    si es Onadeta o Marejol.
   */
   function roundedWaveHeight(waveHeight) {
     if (waveHeight == null || Number.isNaN(waveHeight)) return null;
@@ -494,9 +491,16 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!layer || !layerShell) return;
 
     const isMobile = window.matchMedia("(max-width: 900px)").matches;
-    if (isMobile) return;
 
-    const config = windVisualConfig(speed);
+    const config = isMobile
+      ? {
+          ...windVisualConfig(speed),
+          count: 36,
+          opacity: 0.55,
+          duration: 4.6
+        }
+      : windVisualConfig(speed);
+
     const rotation = direction + 90;
 
     layerShell.classList.add("is-fading");
@@ -602,35 +606,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
     updateWindOverlay(session.wind, session.direction);
   }
-function updateAvailableSessionButtons() {
-  const allowedTimes = SESSION_TIMES_BY_DAY[selectedSessionDay] || [];
 
-  if (!allowedTimes.includes(selectedSessionTime)) {
-    selectedSessionTime = allowedTimes[0] || "08:00";
+  function updateAvailableSessionButtons() {
+    const allowedTimes = SESSION_TIMES_BY_DAY[selectedSessionDay] || [];
+
+    if (!allowedTimes.includes(selectedSessionTime)) {
+      selectedSessionTime = allowedTimes[0] || "08:00";
+    }
+
+    document.querySelectorAll(".session-btn").forEach(btn => {
+      const isAllowed = allowedTimes.includes(btn.dataset.time);
+      btn.hidden = !isAllowed;
+    });
   }
 
-  document.querySelectorAll(".session-btn").forEach(btn => {
-    const isAllowed = allowedTimes.includes(btn.dataset.time);
-    btn.hidden = !isAllowed;
-  });
-}
   function syncControls() {
-  updateAvailableSessionButtons();
+    updateAvailableSessionButtons();
 
-  document.querySelectorAll(".day-btn").forEach(btn => {
-    btn.classList.toggle(
-      "active",
-      Number(btn.dataset.day) === selectedSessionDay
-    );
-  });
+    document.querySelectorAll(".day-btn").forEach(btn => {
+      btn.classList.toggle(
+        "active",
+        Number(btn.dataset.day) === selectedSessionDay
+      );
+    });
 
-  document.querySelectorAll(".session-btn").forEach(btn => {
-    btn.classList.toggle(
-      "active",
-      btn.dataset.time === selectedSessionTime
-    );
-  });
-}
+    document.querySelectorAll(".session-btn").forEach(btn => {
+      btn.classList.toggle(
+        "active",
+        btn.dataset.time === selectedSessionTime
+      );
+    });
+  }
 
   function attachControlEvents() {
     document.querySelectorAll(".day-btn").forEach(button => {
@@ -737,6 +743,10 @@ function updateAvailableSessionButtons() {
   window.addEventListener("resize", () => {
     if (map) {
       setTimeout(() => map.invalidateSize(), 150);
+    }
+
+    if (cachedWeatherData) {
+      updateSessionForecast(cachedWeatherData);
     }
   });
 });
