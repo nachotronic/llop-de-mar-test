@@ -216,7 +216,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (waveHeight < 0.10) return "assets/meteocat/mar-en-calma.svg";
-  if (waveHeight <= 0.20) return "assets/meteocat/onadeta.svg";
+  if (waveHeight <= 0.21) return "assets/meteocat/onadeta.svg";
   if (waveHeight < 0.50) return "assets/meteocat/marejol.svg";
   if (waveHeight < 1.25) return "assets/meteocat/maror.svg";
   if (waveHeight < 2.50) return "assets/meteocat/forta-maror.svg";
@@ -268,7 +268,7 @@ function seaMiniIconHTML(marine) {
       return "Mar en calma: condicions molt favorables pel que fa a l'onatge.";
     }
 
-    if (marine.waveHeight <= 0.20) {
+    if (marine.waveHeight <= 0.21) {
       return "Onadeta: mar molt suau, en principi còmoda per remar.";
     }
 
