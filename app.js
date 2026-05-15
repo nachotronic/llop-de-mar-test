@@ -187,7 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (waveHeight < 0.10) return "Mar en calma";
-    if (waveHeight <= 0.20) return "Onadeta";
+    if (waveHeight <= 0.21) return "Onadeta";
     if (waveHeight < 0.50) return "Marejol";
     if (waveHeight < 1.25) return "Maror";
     if (waveHeight < 2.50) return "Forta maror";
@@ -198,7 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function seaStateLevel(waveHeight) {
     if (waveHeight == null || Number.isNaN(waveHeight)) return "unknown";
     if (waveHeight < 0.10) return "calm";
-    if (waveHeight <= 0.20) return "small";
+    if (waveHeight <= 0.21) return "small";
     if (waveHeight < 0.50) return "moderate";
     if (waveHeight < 1.25) return "high";
 
