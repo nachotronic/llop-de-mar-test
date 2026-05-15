@@ -195,15 +195,25 @@ document.addEventListener("DOMContentLoaded", () => {
     return "Maregassa";
   }
 
-  function seaStateLevel(waveHeight) {
-    if (waveHeight == null || Number.isNaN(waveHeight)) return "unknown";
-    if (waveHeight < 0.10) return "calm";
-    if (waveHeight <= 0.21) return "small";
-    if (waveHeight < 0.50) return "moderate";
-    if (waveHeight < 1.25) return "high";
+  function seaStateLabel(waveHeight) {
+  const rounded = roundedWaveHeight(waveHeight);
 
-    return "very-high";
+  if (rounded == null) {
+    return "Mar sense dades";
   }
+
+  if (rounded < 0.10) return "Mar en calma";
+  if (rounded < 0.21) return "Onadeta";
+  if (rounded < 0.50) return "Marejol";
+  if (rounded < 1.25) return "Maror";
+  if (rounded < 2.50) return "Forta maror";
+
+  return "Maregassa";
+}
+  function roundedWaveHeight(waveHeight) {
+  if (waveHeight == null || Number.isNaN(waveHeight)) return null;
+  return Math.round(waveHeight * 10) / 10;
+}
 
   function waveDirectionLabel(deg) {
     if (deg == null || Number.isNaN(deg)) return "direcció sense dades";
@@ -211,15 +221,17 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
  function seaIconFile(waveHeight) {
-  if (waveHeight == null || Number.isNaN(waveHeight)) {
+  const rounded = roundedWaveHeight(waveHeight);
+
+  if (rounded == null) {
     return "assets/meteocat/marejol.svg";
   }
 
-  if (waveHeight < 0.10) return "assets/meteocat/mar-en-calma.svg";
-  if (waveHeight <= 0.21) return "assets/meteocat/onadeta.svg";
-  if (waveHeight < 0.50) return "assets/meteocat/marejol.svg";
-  if (waveHeight < 1.25) return "assets/meteocat/maror.svg";
-  if (waveHeight < 2.50) return "assets/meteocat/forta-maror.svg";
+  if (rounded < 0.10) return "assets/meteocat/mar-en-calma.svg";
+  if (rounded < 0.21) return "assets/meteocat/onadeta.svg";
+  if (rounded < 0.50) return "assets/meteocat/marejol.svg";
+  if (rounded < 1.25) return "assets/meteocat/maror.svg";
+  if (rounded < 2.50) return "assets/meteocat/forta-maror.svg";
 
   return "assets/meteocat/maregassa.svg";
 }
@@ -250,7 +262,7 @@ function seaMiniIconHTML(marine) {
 
       <span class="sea-mini-data">
         <span>
-          <span class="sea-mini-value">${marine.waveHeight.toFixed(1)} m</span>
+          <span class="sea-mini-value">${roundedWaveHeight(marine.waveHeight).toFixed(1)} m</span>
           <span class="sea-mini-label">${seaStateLabel(marine.waveHeight)}</span>
         </span>
         ${directionHTML}
