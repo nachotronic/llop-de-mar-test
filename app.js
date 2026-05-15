@@ -456,8 +456,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     layer.innerHTML = "";
 
-    const cols = 18;
-    const rows = Math.ceil(count / cols);
+    const isMobile = window.matchMedia("(max-width: 900px)").matches;
+const cols = isMobile ? 8 : 18;
+const rows = isMobile ? 7 : Math.ceil(count / cols);
 
     for (let i = 0; i < count; i++) {
       const el = document.createElement("span");
@@ -465,10 +466,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const col = i % cols;
       const row = Math.floor(i / cols);
-      const usableWidth = 96;
-      const usableHeight = 90;
-      const leftStart = 1;
-      const topStart = 3;
+     const usableWidth = isMobile ? 94 : 96;
+const usableHeight = isMobile ? 88 : 90;
+const leftStart = isMobile ? 3 : 1;
+const topStart = isMobile ? 6 : 3;
       const leftStep = usableWidth / Math.max(cols - 1, 1);
       const topStep = usableHeight / Math.max(rows - 1, 1);
       const leftJitter = ((i * 13) % 5) - 2;
@@ -495,9 +496,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const config = isMobile
       ? {
           ...windVisualConfig(speed),
-          count: 36,
-          opacity: 0.55,
-          duration: 4.6
+          count: 56,
+          opacity: 0.52,
+          duration: 4.8
         }
       : windVisualConfig(speed);
 
