@@ -1,7 +1,15 @@
 /*
-  app.js · Llop de Mar
-  Versión estable con mar bajo la rosa de los vientos
-  SIN iconos externos de Meteocat.
+  app.js · Llop de Mar Test
+  Versión con iconos Meteocat y redondeo común de ola.
+
+  Importante:
+  Los iconos deben estar en:
+  assets/meteocat/mar-en-calma.svg
+  assets/meteocat/onadeta.svg
+  assets/meteocat/marejol.svg
+  assets/meteocat/maror.svg
+  assets/meteocat/forta-maror.svg
+  assets/meteocat/maregassa.svg
 */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -181,118 +189,120 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
+  /*
+    ESTADO DE LA MAR
+
+    Usamos siempre el valor redondeado a 1 decimal para:
+    - mostrar la altura;
+    - elegir icono;
+    - elegir etiqueta;
+    - elegir comentario.
+
+    Así, si se muestra 0,2 m, también se usa 0,2 para decidir
+    si es Onadeta o Marejol.
+  */
+  function roundedWaveHeight(waveHeight) {
+    if (waveHeight == null || Number.isNaN(waveHeight)) return null;
+    return Math.round(waveHeight * 10) / 10;
+  }
+
   function seaStateLabel(waveHeight) {
-    if (waveHeight == null || Number.isNaN(waveHeight)) {
+    const rounded = roundedWaveHeight(waveHeight);
+
+    if (rounded == null) {
       return "Mar sense dades";
     }
 
-    if (waveHeight < 0.10) return "Mar en calma";
-    if (waveHeight <= 0.21) return "Onadeta";
-    if (waveHeight < 0.50) return "Marejol";
-    if (waveHeight < 1.25) return "Maror";
-    if (waveHeight < 2.50) return "Forta maror";
+    if (rounded < 0.10) return "Mar en calma";
+    if (rounded < 0.21) return "Onadeta";
+    if (rounded < 0.50) return "Marejol";
+    if (rounded < 1.25) return "Maror";
+    if (rounded < 2.50) return "Forta maror";
 
     return "Maregassa";
   }
-
-  function seaStateLabel(waveHeight) {
-  const rounded = roundedWaveHeight(waveHeight);
-
-  if (rounded == null) {
-    return "Mar sense dades";
-  }
-
-  if (rounded < 0.10) return "Mar en calma";
-  if (rounded < 0.21) return "Onadeta";
-  if (rounded < 0.50) return "Marejol";
-  if (rounded < 1.25) return "Maror";
-  if (rounded < 2.50) return "Forta maror";
-
-  return "Maregassa";
-}
-  function roundedWaveHeight(waveHeight) {
-  if (waveHeight == null || Number.isNaN(waveHeight)) return null;
-  return Math.round(waveHeight * 10) / 10;
-}
 
   function waveDirectionLabel(deg) {
     if (deg == null || Number.isNaN(deg)) return "direcció sense dades";
     return `${windNameCatalan(deg)} · ${directionName(deg)}`;
   }
 
- function seaIconFile(waveHeight) {
-  const rounded = roundedWaveHeight(waveHeight);
+  function seaIconFile(waveHeight) {
+    const rounded = roundedWaveHeight(waveHeight);
 
-  if (rounded == null) {
-    return "assets/meteocat/marejol.svg";
+    if (rounded == null) {
+      return "assets/meteocat/marejol.svg";
+    }
+
+    if (rounded < 0.10) return "assets/meteocat/mar-en-calma.svg";
+    if (rounded < 0.21) return "assets/meteocat/onadeta.svg";
+    if (rounded < 0.50) return "assets/meteocat/marejol.svg";
+    if (rounded < 1.25) return "assets/meteocat/maror.svg";
+    if (rounded < 2.50) return "assets/meteocat/forta-maror.svg";
+
+    return "assets/meteocat/maregassa.svg";
   }
 
-  if (rounded < 0.10) return "assets/meteocat/mar-en-calma.svg";
-  if (rounded < 0.21) return "assets/meteocat/onadeta.svg";
-  if (rounded < 0.50) return "assets/meteocat/marejol.svg";
-  if (rounded < 1.25) return "assets/meteocat/maror.svg";
-  if (rounded < 2.50) return "assets/meteocat/forta-maror.svg";
+  function seaMiniIconHTML(marine) {
+    if (!marine || marine.waveHeight == null) return "";
 
-  return "assets/meteocat/maregassa.svg";
-}
+    const rounded = roundedWaveHeight(marine.waveHeight);
+    const iconSrc = seaIconFile(marine.waveHeight);
 
-function seaMiniIconHTML(marine) {
-  if (!marine || marine.waveHeight == null) return "";
-
-  const iconSrc = seaIconFile(marine.waveHeight);
-
-  const directionHTML = marine.waveDirection != null
-    ? `
-      <span class="sea-mini-direction">
-        <span
-          class="sea-mini-direction-arrow"
-          style="transform: rotate(${marine.waveDirection}deg)"
-          aria-hidden="true"
-        >↑</span>
-        ${waveDirectionLabel(marine.waveDirection)}
-      </span>
-    `
-    : "";
-
-  return `
-    <div class="sea-mini">
-      <span class="sea-mini-icon" aria-hidden="true">
-        <img src="${iconSrc}" alt="" class="sea-mini-img">
-      </span>
-
-      <span class="sea-mini-data">
-        <span>
-          <span class="sea-mini-value">${roundedWaveHeight(marine.waveHeight).toFixed(1)} m</span>
-          <span class="sea-mini-label">${seaStateLabel(marine.waveHeight)}</span>
+    const directionHTML = marine.waveDirection != null
+      ? `
+        <span class="sea-mini-direction">
+          <span
+            class="sea-mini-direction-arrow"
+            style="transform: rotate(${marine.waveDirection}deg)"
+            aria-hidden="true"
+          >↑</span>
+          ${waveDirectionLabel(marine.waveDirection)}
         </span>
-        ${directionHTML}
-      </span>
-    </div>
-  `;
-}
+      `
+      : "";
+
+    return `
+      <div class="sea-mini">
+        <span class="sea-mini-icon" aria-hidden="true">
+          <img src="${iconSrc}" alt="" class="sea-mini-img">
+        </span>
+
+        <span class="sea-mini-data">
+          <span>
+            <span class="sea-mini-value">${rounded.toFixed(1)} m</span>
+            <span class="sea-mini-label">${seaStateLabel(marine.waveHeight)}</span>
+          </span>
+          ${directionHTML}
+        </span>
+      </div>
+    `;
+  }
 
   function marineComment(marine) {
     if (!marine || marine.waveHeight == null) {
       return "No hi ha dades d'onatge per a aquesta hora.";
     }
 
-    if (marine.waveHeight < 0.10) {
+    const rounded = roundedWaveHeight(marine.waveHeight);
+
+    if (rounded < 0.10) {
       return "Mar en calma: condicions molt favorables pel que fa a l'onatge.";
     }
 
-    if (marine.waveHeight <= 0.21) {
+    if (rounded < 0.21) {
       return "Onadeta: mar molt suau, en principi còmoda per remar.";
     }
 
-    if (marine.waveHeight < 0.50) {
+    if (rounded < 0.50) {
       return "Marejol: una mica d'onatge, però en principi assumible si l'estat real de la badia acompanya.";
     }
 
-    if (marine.waveHeight < 1.25) {
+    if (rounded < 1.25) {
       return "Maror: valoreu la sortida segons el nivell del grup i l'estat real de la badia.";
     }
 
-    if (marine.waveHeight < 2.50) {
+    if (rounded < 2.50) {
       return "Forta maror: condicions exigents. Millor mantenir-se en zona molt protegida o no sortir.";
     }
 
@@ -375,12 +385,12 @@ function seaMiniIconHTML(marine) {
   }
 
   function rowingRecommendation({ wind, rain }, marine) {
-    const waveHeight = marine?.waveHeight ?? 0;
+    const roundedWave = roundedWaveHeight(marine?.waveHeight) ?? 0;
 
     if (
       wind >= 45 ||
       rain >= 12 ||
-      waveHeight >= 2.50 ||
+      roundedWave >= 2.50 ||
       (wind >= 35 && rain >= 5)
     ) {
       return {
@@ -389,14 +399,14 @@ function seaMiniIconHTML(marine) {
       };
     }
 
-    if (wind >= 30 || rain >= 5 || waveHeight >= 1.25) {
+    if (wind >= 30 || rain >= 5 || roundedWave >= 1.25) {
       return {
         text: "Quedar-se dins la badia",
         color: "#b7791f"
       };
     }
 
-    if (wind >= 18 || rain >= 0.8 || waveHeight >= 0.70) {
+    if (wind >= 18 || rain >= 0.8 || roundedWave >= 0.70) {
       return {
         text: "Sortida amb precaució",
         color: "#b7791f"
@@ -411,10 +421,11 @@ function seaMiniIconHTML(marine) {
 
   function sessionAlert({ wind, rain }, marine) {
     const alerts = [];
+    const roundedWave = roundedWaveHeight(marine?.waveHeight) ?? 0;
 
     if (rain >= 3) alerts.push("pluja prevista");
     if (wind >= 30) alerts.push("vent fort");
-    if (marine && marine.waveHeight >= 1.25) alerts.push("onatge important");
+    if (roundedWave >= 1.25) alerts.push("onatge important");
 
     return alerts.length
       ? `Avís per al grup: ${alerts.join(", ")}. Reviseu l'estat real abans de sortir.`
@@ -691,6 +702,10 @@ function seaMiniIconHTML(marine) {
     console.assert(nextSessionDate("08:00", 1) instanceof Date, "nextSessionDate debería devolver Date");
     console.assert(seaStateLabel(0.05) === "Mar en calma", "0.05 m debería ser Mar en calma");
     console.assert(seaStateLabel(0.15) === "Onadeta", "0.15 m debería ser Onadeta");
+    console.assert(seaIconFile(0.05).includes("mar-en-calma.svg"), "0.05 m debería usar mar-en-calma.svg");
+    console.assert(seaIconFile(0.15).includes("onadeta.svg"), "0.15 m debería usar onadeta.svg");
+    console.assert(seaIconFile(0.24).includes("onadeta.svg"), "0.24 redondea a 0.2 y debería usar onadeta.svg");
+    console.assert(seaIconFile(0.25).includes("marejol.svg"), "0.25 redondea a 0.3 y debería usar marejol.svg");
   }
 
   runSmokeTests();
